@@ -56,44 +56,40 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
   }
 });
 
-// Express route to fetch all dealerships
+// ✅ Fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
     try {
-        const dealerships = await Dealership.find();
-        res.json(dealerships);
+      const documents = await Dealerships.find();
+      res.json(documents);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      res.status(500).json({ error: 'Error fetching dealerships' });
     }
 });
 
-// Express route to fetch Dealers by a particular state
 app.get('/fetchDealers/:state', async (req, res) => {
     try {
-        const state = req.params.state;
-        const dealerships = await Dealership.find({ state: state });
-        res.json(dealerships);
+      const state = req.params.state.toUpperCase(); // Standardizing state input
+      const documents = await Dealerships.find({ state });
+      res.json(documents);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      res.status(500).json({ error: 'Error fetching dealerships by state' });
     }
 });
-
-// Express route to fetch dealer by a particular id
+// ✅ Fetch dealer by ID
 app.get('/fetchDealer/:id', async (req, res) => {
     try {
-        const id = req.params.id;
-        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
-            return res.status(400).json({ message: 'Invalid dealer ID format' });
-        }
-
-        const dealership = await Dealership.findById(id);
-        if (!dealership) {
-            return res.status(404).json({ message: 'Dealer not found' });
-        }
-        res.json(dealership);
+      const dealer = await Dealerships.findOne({ id: parseInt(req.params.id) });
+      if (dealer) {
+        res.json(dealer);
+      } else {
+        res.status(404).json({ error: 'Dealer not found' });
+      }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      res.status(500).json({ error: 'Error fetching dealer by ID' });
     }
 });
+    
+  
 
 //Express route to insert review
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
